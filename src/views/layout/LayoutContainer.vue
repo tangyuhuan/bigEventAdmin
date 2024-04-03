@@ -11,11 +11,37 @@ import {
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import { useUserStore } from '@/stores'
+import { useRouter } from 'vue-router'
 // import { ref } from 'vue'
 
 const userStore = useUserStore()
 userStore.getUser()
-// console.log(userStore.user)
+
+//对函数进行async修饰，该函数就会变成异步函数，内可以使用await关键字，await后往往跟一个promise对象，里面有异步任务。
+//await也会原地等待异步的成功结果，并将成功状态的结果赋给左边变量，再放行代码。
+const router = useRouter()
+const handleCommand = async (command) => {
+  if (command == 'logout') {
+    //退出操作
+    try {
+      await ElMessageBox.confirm('你确认退出大事件吗？', '温馨提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      userStore.removeToken()
+      userStore.setUser({})
+      router.push('/login')
+    } catch {
+      console.log('取消退出登录')
+    }
+  } else {
+    //跳转操作
+    router.push(`/user/${command}`)
+  }
+
+  //   ElMessage(`click on item ${command}`)
+}
 </script>
 <template>
   <!-- :default-active="$route.path" 默认高亮的菜单项
@@ -83,13 +109,14 @@ router 是否启用 vue - router 模式。 router选项开启，el - menu - item
           <div>
             黑马程序员：<strong>{{ userStore.user.username }}</strong>
           </div>
-          <el-dropdown placement="bottom-end">
+          <el-dropdown placement="bottom-end" @command="handleCommand">
             <span class="el-dropdown__box">
               <el-avatar :src="userStore.user.user_pic || avatar" />
               <el-icon>
                 <CaretBottom />
               </el-icon>
             </span>
+            <!-- 折叠的下拉部分 -->
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile" :icon="User"

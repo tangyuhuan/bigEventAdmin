@@ -5,7 +5,7 @@ import { userRegisterService, userLoginService } from '@/api/user.js'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
 
-const isRegister = ref(true)
+const isRegister = ref(false)
 //整个用于提交的form数据对象
 //登录注册共用formModel数据
 const formModel = ref({
