@@ -1,6 +1,6 @@
 <script setup>
 import {
-  //   Management,
+  Management,
   Promotion,
   UserFilled,
   User,
@@ -61,7 +61,9 @@ router 是否启用 vue - router 模式。 router选项开启，el - menu - item
               router
             >
               <el-menu-item index="/article/channel">
-                <el-icon><icon-menu /></el-icon>
+                <el-icon>
+                  <Management />
+                </el-icon>
                 <span>文章分类</span>
               </el-menu-item>
               <el-menu-item index="/article/manage">
@@ -107,7 +109,9 @@ router 是否启用 vue - router 模式。 router选项开启，el - menu - item
       <el-container>
         <el-header>
           <div>
-            黑马程序员：<strong>{{ userStore.user.username }}</strong>
+            黑马程序员：<strong>{{
+              userStore.user.nickname || userStore.user.username
+            }}</strong>
           </div>
           <el-dropdown placement="bottom-end" @command="handleCommand">
             <span class="el-dropdown__box">
