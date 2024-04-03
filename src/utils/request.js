@@ -16,7 +16,7 @@ const baseURL = 'http://big-event-vue-api-t.itheima.net'
 const instance = axios.create({
   // TODO 1. 基础地址，超时时间
   baseURL: baseURL,
-  timeout: 1000
+  timeout: 5000 //允许最大的超时时间
 })
 
 //拦截器:在请求或响应被 then 或 catch 处理前拦截它们。
@@ -54,6 +54,7 @@ instance.interceptors.response.use(
       router.push('/login')
     }
     // 错误的默认情况 =》只要给提示
+    console.log(err)
     ElMessage.error(err.response.data.message || '服务异常')
     return Promise.reject(err)
   }

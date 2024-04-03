@@ -5,11 +5,17 @@ import {
   UserFilled,
   User,
   Crop,
-  EditPen
-  //   SwitchButton,
-  //   CaretBottom
+  EditPen,
+  SwitchButton,
+  CaretBottom
 } from '@element-plus/icons-vue'
-// import avatar from '@/assets/default.png'
+import avatar from '@/assets/default.png'
+import { useUserStore } from '@/stores'
+// import { ref } from 'vue'
+
+const userStore = useUserStore()
+userStore.getUser()
+// console.log(userStore.user)
 </script>
 <template>
   <!-- :default-active="$route.path" 默认高亮的菜单项
@@ -73,8 +79,39 @@ router 是否启用 vue - router 模式。 router选项开启，el - menu - item
         </el-row>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
-        <el-main>Main</el-main>
+        <el-header>
+          <div>
+            黑马程序员：<strong>{{ userStore.user.username }}</strong>
+          </div>
+          <el-dropdown placement="bottom-end">
+            <span class="el-dropdown__box">
+              <el-avatar :src="userStore.user.user_pic || avatar" />
+              <el-icon>
+                <CaretBottom />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="profile" :icon="User"
+                  >基本资料</el-dropdown-item
+                >
+                <el-dropdown-item command="avatar" :icon="Crop"
+                  >更换头像</el-dropdown-item
+                >
+                <el-dropdown-item command="password" :icon="EditPen"
+                  >重置密码</el-dropdown-item
+                >
+                <el-dropdown-item command="logout" :icon="SwitchButton"
+                  >退出登录</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </el-header>
+        <el-main>
+          <router-view></router-view>
+        </el-main>
+        <el-footer>大事件 ©2023 Created by 黑马程序员</el-footer>
       </el-container>
     </el-container>
   </div>

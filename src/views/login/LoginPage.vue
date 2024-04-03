@@ -71,7 +71,6 @@ const login = async () => {
   const res = await userLoginService(formModel.value)
   userStore.setToken(res.data.token)
   // console.log(res)
-
   ElMessage.success('登录成功') //element配置了按需导入，组件和方法都可以自动导入，但是需要告知eslint此不需要校验
   router.push('/')
 }
