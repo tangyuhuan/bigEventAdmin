@@ -1,6 +1,11 @@
 <script setup></script>
 <template>
-  <div>频道管理</div>
+  <page-container title="文章分类">
+    <template #extra>
+      <el-button type="primary">添加分类</el-button>
+    </template>
+    <p v-for="o in 4" :key="o" class="text item">{{ 'List item ' + o }}</p>
+  </page-container>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped></style>
