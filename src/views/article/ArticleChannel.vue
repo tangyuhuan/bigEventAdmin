@@ -22,6 +22,9 @@ const handleEdit = (index, row) => {
 const onAddChannel = () => {
   dialog.value.open({})
 }
+const onSuccess = () => {
+  getList()
+}
 </script>
 <template>
   <page-container title="文章分类">
@@ -53,7 +56,7 @@ const onAddChannel = () => {
         <el-empty description="没有数据" />
       </template>
     </el-table>
-    <channel-edit ref="dialog"></channel-edit>
+    <channel-edit ref="dialog" @success="onSuccess"></channel-edit>
   </page-container>
 </template>
 
