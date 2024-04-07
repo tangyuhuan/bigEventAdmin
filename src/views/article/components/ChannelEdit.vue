@@ -40,6 +40,7 @@ const onSubmit = async () => {
     type: 'success',
     message: formModel.value.id ? '编辑成功' : '添加成功'
   })
+  //通知父组件回显
   emit('success')
   dialogVisible.value = false
 }

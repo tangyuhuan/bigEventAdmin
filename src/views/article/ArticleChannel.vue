@@ -1,6 +1,6 @@
 <script setup>
 import { Edit, Delete } from '@element-plus/icons-vue'
-import { artGetChannelService } from '@/api/article.js'
+import { artGetChannelService, artDelChannelService } from '@/api/article.js'
 import { ref } from 'vue'
 import ChannelEdit from './components/ChannelEdit.vue'
 const loading = ref(true)
@@ -13,9 +13,25 @@ const getList = async () => {
   console.log(channelList.value)
 }
 getList()
-const handleDelete = (index, row) => {
-  console.log(index, row)
+//分类文章删除
+const handleDelete = async (index, row) => {
+  //ElMessageBox消息弹出框
+  await ElMessageBox.confirm('你确认删除该分类信息吗?', '温馨提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+  await artDelChannelService(row.id)
+  ElMessage({
+    type: 'success',
+    message: '删除成功'
+  })
+  getList()
+  // console.log(index, row)
 }
+// const handleDelete = (index, row) => {
+//   console.log(index, row)
+// }
 const handleEdit = (index, row) => {
   dialog.value.open(row)
 }
