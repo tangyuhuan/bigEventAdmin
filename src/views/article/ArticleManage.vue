@@ -3,8 +3,10 @@ import { ref } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import ChannelSelect from './components/ChannelSelect.vue'
 import { artGetManageService } from '@/api/article'
+import { formatTime } from '@/utils/format.js'
 
-const articleList = ref([])
+const articleList = ref([]) //文章列表
+const total = ref(0) //总条数
 const loading = ref(true)
 //定义“获取-文章列表”的请求参数对象
 const params = ref({
@@ -22,12 +24,13 @@ const onEditArticle = (row) => {
 const onDeleteArticle = (row) => {
   console.log(row)
 }
-//搜索
+//基于params参数，获取文章列表
 const onGetList = async () => {
   loading.value = true
   const res = await artGetManageService(params.value)
   // console.log(res.data.data)
   articleList.value = res.data.data
+  total.value = res.data.total
   loading.value = false
 }
 //进页面初始化列表
@@ -86,7 +89,10 @@ const onReset = () => {
         </template>
       </el-table-column>
       <el-table-column prop="cate_name" label="分类"></el-table-column>
-      <el-table-column prop="pub_date" label="发表时间"></el-table-column>
+      <el-table-column prop="pub_date" label="发表时间">
+        <!-- prop里只能放直接展示的数据，可通过默认插槽展示日期格式化后数据，展示遵循优先取默认插槽，后取prop的顺序 -->
+        <template #default="{ row }">{{ formatTime(row.pub_date) }}</template>
+      </el-table-column>
       <el-table-column prop="state" label="状态"></el-table-column>
       <el-table-column prop="" label="操作">
         <!-- 利用作用域插槽row可以拿到当前行的数据，填充自定义的结构  等价于v-for遍历的item -->
