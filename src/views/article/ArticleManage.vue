@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import ChannelSelect from './components/ChannelSelect.vue'
+import ArticleEdit from './components/ArticleEdit.vue'
 import { artGetManageService } from '@/api/article'
 import { formatTime } from '@/utils/format.js'
 
@@ -16,14 +17,6 @@ const params = ref({
   state: ''
 })
 
-//编辑逻辑
-const onEditArticle = (row) => {
-  console.log(row)
-}
-//删除逻辑
-const onDeleteArticle = (row) => {
-  console.log(row)
-}
 //基于params参数，获取文章列表
 const onGetList = async () => {
   loading.value = true
@@ -62,11 +55,27 @@ const onCurrentChange = (val) => {
   params.value.pagenum = val
   onGetList()
 }
+
+const articleEditRef = ref()
+//编辑逻辑
+const onEditArticle = (row) => {
+  // visibleDrawer.value = true
+  // console.log(row)
+  articleEditRef.value.open(row)
+}
+//发布文章
+const onAddArticle = () => {
+  articleEditRef.value.open({})
+}
+//删除逻辑
+const onDeleteArticle = () => {
+  // console.log(row)
+}
 </script>
 <template>
   <page-container title="文章管理">
     <template #extra>
-      <el-button type="primary">发布文章</el-button>
+      <el-button type="primary" @click="onAddArticle">发布文章</el-button>
     </template>
     <!-- 表单区域 -->
     <!-- 通过设置 inline 属性为 true 可以让表单域变为行内的表单域。 -->
@@ -140,6 +149,7 @@ const onCurrentChange = (val) => {
       style="margin-top: 20px; justify-content: flex-end"
     />
   </page-container>
+  <article-edit ref="articleEditRef"></article-edit>
 </template>
 
 <style lang="scss" scoped>
