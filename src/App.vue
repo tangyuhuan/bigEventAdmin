@@ -1,4 +1,6 @@
 <script setup>
+import zh from 'element-plus/es/locale/lang/zh-cn.mjs'
+
 //在 Vue3 CompositionAPI中
 //1.获取路由对象 router 有专门的方法useRouter
 // const router = useRouter()
@@ -24,7 +26,10 @@
 // }
 </script>
 <template>
-  <router-view></router-view>
+  <!-- 国际化处理 -->
+  <el-config-provider :locale="zh">
+    <router-view></router-view>
+  </el-config-provider>
   <!-- <div>我是APP</div>
   <test-demo></test-demo>
   <el-button @click="$router.push('/home')" type="success">跳首页</el-button>

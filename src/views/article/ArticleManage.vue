@@ -1,27 +1,19 @@
 <script setup>
 import { ref } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
-const formInline = ref({
-  user: '',
-  region: '',
-  date: ''
+import ChannelSelect from './components/ChannelSelect.vue'
+import { artGetManageService } from '@/api/article'
+
+const articleList = ref([])
+const loading = ref(true)
+//定义“获取-文章列表”的请求参数对象
+const params = ref({
+  pagenum: 1,
+  pagesize: 5,
+  cate_id: '',
+  state: ''
 })
-const articleList = ref([
-  {
-    Id: 5961,
-    title: '新的文章啊',
-    pub_date: '2022-07-10 14:53:52.604',
-    state: '已发布',
-    cate_name: '体育'
-  },
-  {
-    Id: 5962,
-    title: '新的文章啊',
-    pub_date: '2022-07-10 14:54:30.904',
-    state: null,
-    cate_name: '体育'
-  }
-])
+
 //编辑逻辑
 const onEditArticle = (row) => {
   console.log(row)
@@ -29,6 +21,26 @@ const onEditArticle = (row) => {
 //删除逻辑
 const onDeleteArticle = (row) => {
   console.log(row)
+}
+//搜索
+const onGetList = async () => {
+  loading.value = true
+  const res = await artGetManageService(params.value)
+  // console.log(res.data.data)
+  articleList.value = res.data.data
+  loading.value = false
+}
+//进页面初始化列表
+onGetList()
+//重置
+const onReset = () => {
+  params.value = {
+    pagenum: 1,
+    pagesize: 5,
+    cate_id: '',
+    state: ''
+  }
+  onGetList()
 }
 </script>
 <template>
@@ -38,30 +50,37 @@ const onDeleteArticle = (row) => {
     </template>
     <!-- 表单区域 -->
     <!-- 通过设置 inline 属性为 true 可以让表单域变为行内的表单域。 -->
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="文章分类:">
-        <!-- label 展示给用户看的，value收集起来提交给后台的 -->
-        <el-select v-model="formInline.region" placeholder="请选择" clearable>
-          <el-option label="新闻" value="110" />
-          <el-option label="新闻" value="110" />
-          <el-option label="体育" value="137" />
-        </el-select>
+        <!-- label 展示给用户看的，value收集起来提交给后台的  placeholder="请选择" -->
+        <!-- Vue2 => v-model是 :value和@input的简写 
+        Vue3 => v-model是 :modelValue和@update:modelValue的简写 -->
+        <channel-select v-model="params.cate_id"></channel-select>
+        <!-- 等价于
+        <channel-select v-model:modelValue="params.cate_id"></channel-select> -->
+        <!-- Vue3 => v-model:cid 是:cid 和 @update:cid 的简写 -->
+        <!-- <channel-select v-model:cid="params.cate_id"></channel-select> -->
       </el-form-item>
       <el-form-item label="发布状态:">
-        <!-- 后台标记发布状态，就是通过中文标记的，"已发布", "草稿" -->
-        <el-select v-model="formInline.region" placeholder="请选择" clearable>
+        <!-- 后台标记发布状态，就是通过中文标记的，"已发布", "草稿"  placeholder="请选择" -->
+        <el-select v-model="params.state" clearable>
           <el-option label="已发布" value="已发布" />
           <el-option label="草稿" value="草稿" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">搜索</el-button>
-        <el-button @click="onSubmit">重置</el-button>
+        <el-button type="primary" @click="onGetList">搜索</el-button>
+        <el-button @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
     <!-- 表格区域 -->
-    <el-table :data="articleList" height="250" style="width: 100%">
-      <el-table-column prop="title" label="文章标题">
+    <el-table
+      :data="articleList"
+      height="250"
+      style="width: 100%"
+      v-loading="loading"
+    >
+      <el-table-column prop="title" label="文章标题" width="300">
         <template #default="{ row }">
           <el-link type="primary" :underline="false">{{ row.title }}</el-link>
         </template>
