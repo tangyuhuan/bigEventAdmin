@@ -33,28 +33,32 @@ const onGetList = async () => {
   total.value = res.data.total
   loading.value = false
 }
+
 //进页面初始化列表
 onGetList()
+
+//搜索
+const onSearch = () => {
+  params.value.pagenum = 1
+  onGetList()
+}
 //重置
 const onReset = () => {
-  params.value = {
-    pagenum: 1,
-    pagesize: 5,
-    cate_id: '',
-    state: ''
-  }
+  params.value.pagenum = 1
+  params.value.cate_id = ''
+  params.value.state = ''
   onGetList()
 }
 //每页条数变化时会触发
 const onSizeChange = (val) => {
-  console.log(`${val} items per page`)
+  // console.log(`${val} items per page`)
   params.value.pageSize = val
   params.value.pagenum = 1
   onGetList()
 }
 //当前页变化会触发
 const onCurrentChange = (val) => {
-  console.log(`current page: ${val}`)
+  // console.log(`current page: ${val}`)
   params.value.pagenum = val
   onGetList()
 }
@@ -85,7 +89,7 @@ const onCurrentChange = (val) => {
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onGetList">搜索</el-button>
+        <el-button type="primary" @click="onSearch">搜索</el-button>
         <el-button @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
