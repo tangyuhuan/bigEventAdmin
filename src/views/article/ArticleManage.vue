@@ -10,8 +10,8 @@ const total = ref(0) //总条数
 const loading = ref(true)
 //定义“获取-文章列表”的请求参数对象
 const params = ref({
-  pagenum: 1,
-  pagesize: 5,
+  pagenum: 1, //当前页
+  pagesize: 5, //当前生效的每页条数
   cate_id: '',
   state: ''
 })
@@ -43,6 +43,19 @@ const onReset = () => {
     cate_id: '',
     state: ''
   }
+  onGetList()
+}
+//每页条数变化时会触发
+const onSizeChange = (val) => {
+  console.log(`${val} items per page`)
+  params.value.pageSize = val
+  params.value.pagenum = 1
+  onGetList()
+}
+//当前页变化会触发
+const onCurrentChange = (val) => {
+  console.log(`current page: ${val}`)
+  params.value.pagenum = val
   onGetList()
 }
 </script>
@@ -77,12 +90,7 @@ const onReset = () => {
       </el-form-item>
     </el-form>
     <!-- 表格区域 -->
-    <el-table
-      :data="articleList"
-      height="250"
-      style="width: 100%"
-      v-loading="loading"
-    >
+    <el-table :data="articleList" style="width: 100%" v-loading="loading">
       <el-table-column prop="title" label="文章标题" width="300">
         <template #default="{ row }">
           <el-link type="primary" :underline="false">{{ row.title }}</el-link>
@@ -114,6 +122,19 @@ const onReset = () => {
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页区域 -->
+    <!-- :page-sizes="[2, 3, 5, 10]" 需要包含params.pagesize ,否则会报错 -->
+    <el-pagination
+      v-model:current-page="params.pagenum"
+      v-model:page-size="params.pagesize"
+      :page-sizes="[2, 3, 5, 10]"
+      :background="true"
+      layout="jumper, total, sizes, prev, pager, next"
+      :total="total"
+      @size-change="onSizeChange"
+      @current-change="onCurrentChange"
+      style="margin-top: 20px; justify-content: flex-end"
+    />
   </page-container>
 </template>
 
