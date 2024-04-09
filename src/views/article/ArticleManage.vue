@@ -148,8 +148,8 @@ const onDeleteArticle = () => {
       @current-change="onCurrentChange"
       style="margin-top: 20px; justify-content: flex-end"
     />
+    <article-edit ref="articleEditRef"></article-edit>
   </page-container>
-  <article-edit ref="articleEditRef"></article-edit>
 </template>
 
 <style lang="scss" scoped>

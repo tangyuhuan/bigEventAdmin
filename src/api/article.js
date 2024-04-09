@@ -24,3 +24,15 @@ export const artGetManageService = (params) =>
 //     ID: 12345
 //   }
 // })
+
+//管理：获取-文章详情
+export const artGetInfo = (id) =>
+  request.get('/my/article/info', {
+    params: { id }
+  })
+
+//管理：更新-文章详情
+export const artUpdateInfo = (data) => request.put('/my/article/info', data)
+
+//管理：发布-文章
+export const artAddInfo = (data) => request.post('/my/article/add', data)

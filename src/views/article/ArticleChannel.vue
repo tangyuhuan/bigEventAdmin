@@ -10,7 +10,7 @@ const getList = async () => {
   const res = await artGetChannelService()
   channelList.value = res.data.data
   loading.value = false
-  console.log(channelList.value)
+  // console.log(channelList.value)
 }
 getList()
 //分类文章删除
