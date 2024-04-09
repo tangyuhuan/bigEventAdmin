@@ -7,7 +7,7 @@
 import { artGetChannelService } from '@/api/article.js'
 import { ref, defineModel, defineProps } from 'vue'
 const modelValue = defineModel()
-const props = defineProps({
+defineProps({
   width: {
     type: String
   }
@@ -21,7 +21,7 @@ const channelList = ref([])
 const getList = async () => {
   const res = await artGetChannelService()
   channelList.value = res.data.data
-  console.log(props)
+  //   console.log(props)
   //   console.log(channelList.value)
 }
 
@@ -38,8 +38,8 @@ getList()
     @update:modelValue="emit('update:modelValue', $event)"
     style="width: 240px"
   > -->
-  <!-- 设置宽度还可以用style="width: 100%" -->
-
+  <!-- 固定style  style="width: 100%" -->
+  <!-- https://www.jb51.net/article/263547.htm#_lab2_1_3 -->
   <!-- Vue 动态style  :style=" { width:30px } " -->
   <el-select
     :modelValue="modelValue"

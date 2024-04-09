@@ -35,4 +35,5 @@ export const artGetInfo = (id) =>
 export const artUpdateInfo = (data) => request.put('/my/article/info', data)
 
 //管理：发布-文章
+//注意data需要是form-data格式的对象
 export const artAddInfo = (data) => request.post('/my/article/add', data)

@@ -71,6 +71,18 @@ const onAddArticle = () => {
 const onDeleteArticle = () => {
   // console.log(row)
 }
+//添加/编辑成功的回调
+const onSuccess = (type) => {
+  if (type === 'add') {
+    //如果是添加，渲染最后一页
+    const lastPage = Math.ceil((total.value + 1) / params.value.pagesize)
+    params.value.pagenum = lastPage
+    onGetList()
+  } else {
+    //编辑，渲染当前页
+    onGetList()
+  }
+}
 </script>
 <template>
   <page-container title="文章管理">
@@ -148,7 +160,7 @@ const onDeleteArticle = () => {
       @current-change="onCurrentChange"
       style="margin-top: 20px; justify-content: flex-end"
     />
-    <article-edit ref="articleEditRef"></article-edit>
+    <article-edit ref="articleEditRef" @success="onSuccess"></article-edit>
   </page-container>
 </template>
 

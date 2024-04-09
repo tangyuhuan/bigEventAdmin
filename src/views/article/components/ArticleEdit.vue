@@ -1,8 +1,10 @@
 <script setup>
-import { ref, defineExpose } from 'vue'
+import { ref, defineExpose, defineEmits } from 'vue'
 import { artGetInfo, artUpdateInfo, artAddInfo } from '@/api/article'
 import { Plus } from '@element-plus/icons-vue'
 import ChannelSelect from './ChannelSelect.vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 const visibleDrawer = ref(false)
 
 // 组件对外暴露一个方法 open,  基于 open 的参数，初始化表单数据，并判断区分是添加 还是 编辑
@@ -22,30 +24,29 @@ const defaultForm = {
 }
 //发布-文章接口 + 更新-文章详情接口 的参数对象
 const formModel = ref({ ...defaultForm })
-
+const quilContent = ref()
+const emit = defineEmits(['success'])
 const open = async (row) => {
+  visibleDrawer.value = true
   if (row.id) {
     //编辑
-    // formModel.value = { ...row }
-    formModel.value.id = row.id
-    formModel.value.title = row.title
-    formModel.value.state = row.state
-    // console.log(row)
-    // console.log(formModel.value)
-    const res = await artGetInfo(formModel.value.id)
+    const res = await artGetInfo(row.id)
     console.log(res.data.data)
-    formModel.value.content = res.data.data.content
-    formModel.value.cate_id = res.data.data.cate_id
-    formModel.value.cover_img = res.data.data.cover_img
-    imgUrl.value = URL.createObjectURL(formModel.value.cover_img)
-    console.log(formModel.value)
+    formModel.value = res.data.data
+    // formModel.value.content = res.data.data.content
+    // formModel.value.cate_id = res.data.data.cate_id
+    // formModel.value.cover_img = res.data.data.cover_img
   } else {
     //添加
     //添加前要重置formModel数据
+    // console.log('添加前要重置formModel数据')
     formModel.value = { ...defaultForm }
+    //图片上传img地址、富文本编辑器内容 => 需要手动重置
     imgUrl.value = ''
+    //setHTML
+    quilContent.value.setHTML('')
+    // console.log(formModel.value)
   }
-  visibleDrawer.value = true
 }
 
 //通过defineExpose对外暴露组件的方法
@@ -65,20 +66,32 @@ const rules = ref({
   ]
 })
 const ruleFormRef = ref()
-const submitForm = async () => {
+
+const submitForm = async (state) => {
+  //将已发布还是草稿状态，存入formModel
+  formModel.value.state = state
+  const fd = new FormData()
+  for (let key in formModel.value) {
+    fd.append(key, formModel.value[key])
+  }
   //提交前校验
   await ruleFormRef.value.validate()
+
   if (formModel.value.id) {
-    console.log(formModel.value)
-    await artUpdateInfo(formModel.value)
+    //编辑
+    await artUpdateInfo(fd)
+    //通知父组件,编辑成功了
+    emit('success', 'edit')
   } else {
-    await artAddInfo(formModel.value)
+    //添加
+    await artAddInfo(fd)
+    //通知父组件,添加成功了
+    emit('success', 'add')
   }
   ElMessage({
     type: 'success',
     message: formModel.value.id ? '编辑成功' : '添加成功'
   })
-
   visibleDrawer.value = false
 }
 //图片上传相关逻辑
@@ -136,13 +149,21 @@ const onSelectFile = (uploadFile) => {
         </el-upload>
       </el-form-item>
       <el-form-item label="文章内容" prop="content">
-        <el-input v-model="formModel.content" type="textarea" />
+        <!-- <el-input v-model="formModel.content" type="textarea" /> -->
+        <div class="editor">
+          <quill-editor
+            v-model:content="formModel.content"
+            content-type="html"
+            theme="snow"
+            ref="quilContent"
+          ></quill-editor>
+        </div>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)">
+        <el-button type="primary" @click="submitForm('已发布')">
           发布
         </el-button>
-        <el-button @click="resetForm(ruleFormRef)">草稿</el-button>
+        <el-button @click="submitForm('草稿')">草稿</el-button>
       </el-form-item>
     </el-form>
   </el-drawer>
@@ -176,6 +197,14 @@ const onSelectFile = (uploadFile) => {
       height: 178px;
       text-align: center;
     }
+  }
+}
+
+.editor {
+  width: 100%;
+
+  :deep(.ql-editor) {
+    min-height: 200px;
   }
 }
 </style>
