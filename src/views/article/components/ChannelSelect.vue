@@ -1,7 +1,18 @@
+<!-- 文章分类组件，用法如下
+<el-form-item label="文章分类:">
+    <channel-select v-model="params.cate_id"></channel-select>
+</el-form-item> -->
+
 <script setup>
 import { artGetChannelService } from '@/api/article.js'
-import { ref, defineModel } from 'vue'
+import { ref, defineModel, defineProps } from 'vue'
 const modelValue = defineModel()
+const props = defineProps({
+  width: {
+    type: String
+  }
+})
+// const width1 = { width: '30%' }
 // const props = defineProps({
 //   modelValue: [String, Number] //两种类型都支持
 // })
@@ -10,6 +21,7 @@ const channelList = ref([])
 const getList = async () => {
   const res = await artGetChannelService()
   channelList.value = res.data.data
+  console.log(props)
   //   console.log(channelList.value)
 }
 
@@ -26,10 +38,13 @@ getList()
     @update:modelValue="emit('update:modelValue', $event)"
     style="width: 240px"
   > -->
+  <!-- 设置宽度还可以用style="width: 100%" -->
+
+  <!-- Vue 动态style  :style=" { width:30px } " -->
   <el-select
     :modelValue="modelValue"
     @update:modelValue="modelValue = $event"
-    style="width: 240px"
+    :style="{ width }"
   >
     <el-option
       v-for="item in channelList"

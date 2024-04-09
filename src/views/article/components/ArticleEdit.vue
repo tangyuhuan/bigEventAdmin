@@ -1,12 +1,8 @@
 <script setup>
 import { ref, defineExpose } from 'vue'
-import {
-  artGetInfo,
-  artGetChannelService,
-  artUpdateInfo,
-  artAddInfo
-} from '@/api/article'
+import { artGetInfo, artUpdateInfo, artAddInfo } from '@/api/article'
 import { Plus } from '@element-plus/icons-vue'
+import ChannelSelect from './ChannelSelect.vue'
 const visibleDrawer = ref(false)
 
 // 组件对外暴露一个方法 open,  基于 open 的参数，初始化表单数据，并判断区分是添加 还是 编辑
@@ -15,47 +11,44 @@ const visibleDrawer = ref(false)
 
 // {id: 8080, title: '足球训练', pub_date: 'Sun Apr 07 2024 10:35:06 GMT+0800 (Coordinated Universal Time)', state: '已发布', cate_name: '足球22'}
 
-//发布-文章接口 + 更新-文章详情接口 的参数对象
-const formModel = ref({
+//默认数据
+const defaultForm = {
   id: '',
-  title: '',
-  cate_id: '',
-  content: '',
-  cover_img: '',
-  state: ''
-})
+  title: '', //标题
+  cate_id: '', //分类id
+  content: '', //内容
+  cover_img: '', //封面图片，file格式对象
+  state: '' //状态
+}
+//发布-文章接口 + 更新-文章详情接口 的参数对象
+const formModel = ref({ ...defaultForm })
 
 const open = async (row) => {
-  if (Object.keys(row).length === 0) {
-    getList()
-    visibleDrawer.value = true
-  } else {
+  if (row.id) {
+    //编辑
     // formModel.value = { ...row }
     formModel.value.id = row.id
     formModel.value.title = row.title
     formModel.value.state = row.state
     // console.log(row)
     // console.log(formModel.value)
-
     const res = await artGetInfo(formModel.value.id)
     console.log(res.data.data)
     formModel.value.content = res.data.data.content
     formModel.value.cate_id = res.data.data.cate_id
     formModel.value.cover_img = res.data.data.cover_img
-    getList()
-    visibleDrawer.value = true
+    imgUrl.value = URL.createObjectURL(formModel.value.cover_img)
     console.log(formModel.value)
+  } else {
+    //添加
+    //添加前要重置formModel数据
+    formModel.value = { ...defaultForm }
+    imgUrl.value = ''
   }
-}
-//获取文章分类列表
-const channelList = ref([])
-const getList = async () => {
-  const res = await artGetChannelService()
-  channelList.value = res.data.data
-  channelList
-  console.log(channelList.value)
+  visibleDrawer.value = true
 }
 
+//通过defineExpose对外暴露组件的方法
 defineExpose({
   open
 })
@@ -88,9 +81,15 @@ const submitForm = async () => {
 
   visibleDrawer.value = false
 }
-
-const handleAvatarSuccess = () => {}
-const beforeAvatarUpload = () => {}
+//图片上传相关逻辑
+const imgUrl = ref('')
+const onSelectFile = (uploadFile) => {
+  console.log(uploadFile)
+  //预览图片,uploadFile.raw 是File类型对象
+  imgUrl.value = URL.createObjectURL(uploadFile.raw)
+  //立刻将图片对象，存入formModel.value.cover_img将来用于提交
+  formModel.value.cover_img = uploadFile.raw
+}
 </script>
 <template>
   <el-drawer
@@ -111,29 +110,26 @@ const beforeAvatarUpload = () => {}
       <el-form-item label="文章标题" prop="title">
         <el-input v-model="formModel.title" />
       </el-form-item>
-      <el-form-item label="文章分类" prop="cate_id">
-        <el-select v-model="formModel.cate_id" style="width: 240px">
-          <el-option
-            v-for="item in channelList"
-            :key="item.id"
-            :label="item.cate_name"
-            :value="item.id"
-          />
-        </el-select>
+      <!-- width="100%" -->
+      <el-form-item label="文章分类:" prop="cate_id">
+        <channel-select
+          v-model="formModel.cate_id"
+          width="100%"
+        ></channel-select>
       </el-form-item>
+
       <el-form-item label="文章封面" prop="cover_img">
+        <!-- action就是后台接口地址，请求方式post，请求参数name="file"
+        此处需要关闭element-plus的自动上传，不需要配置action等参数
+        只要做前端本地预览图片即可，无需在提交前上传图片
+        语法：URL.createObjectURL(...)创建本地预览的地址，来预览 -->
         <el-upload
           class="avatar-uploader"
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          :auto-upload="false"
           :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
+          :on-change="onSelectFile"
         >
-          <img
-            v-if="formModel.cover_img"
-            :src="formModel.cover_img"
-            class="avatar"
-          />
+          <img v-if="imgUrl" :src="imgUrl" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon">
             <Plus />
           </el-icon>
@@ -151,25 +147,35 @@ const beforeAvatarUpload = () => {}
     </el-form>
   </el-drawer>
 </template>
-<style>
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
-}
+<style lang="scss" scoped>
+.avatar-uploader {
+  :deep() {
+    .avatar {
+      width: 178px;
+      height: 178px;
+      display: block;
+    }
 
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
-}
+    .el-upload {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--el-transition-duration-fast);
+    }
 
-.el-icon.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
+    .el-upload:hover {
+      border-color: var(--el-color-primary);
+    }
+
+    .el-icon.avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      text-align: center;
+    }
+  }
 }
 </style>
