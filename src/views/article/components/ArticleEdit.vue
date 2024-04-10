@@ -1,10 +1,12 @@
 <script setup>
 import { ref, defineExpose, defineEmits } from 'vue'
 import { artGetInfo, artUpdateInfo, artAddInfo } from '@/api/article'
+import { baseURL } from '@/utils/request'
 import { Plus } from '@element-plus/icons-vue'
 import ChannelSelect from './ChannelSelect.vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import axios from 'axios'
 const visibleDrawer = ref(false)
 
 // 组件对外暴露一个方法 open,  基于 open 的参数，初始化表单数据，并判断区分是添加 还是 编辑
@@ -30,12 +32,19 @@ const open = async (row) => {
   visibleDrawer.value = true
   if (row.id) {
     //编辑
+    //注意: cover_img的值, 需要自己拼接服务器前缀地址, 和接口服务的基地址相同
     const res = await artGetInfo(row.id)
     console.log(res.data.data)
     formModel.value = res.data.data
-    // formModel.value.content = res.data.data.content
-    // formModel.value.cate_id = res.data.data.cate_id
-    // formModel.value.cover_img = res.data.data.cover_img
+    // 图片需要单独处理回显，需要拼接服务器前缀地址
+    imgUrl.value = baseURL + res.data.data.cover_img
+    // 提交给后台，需要的是 file 格式
+    // 需要将网络地址图片，转成 file 格式对象，存储起来
+    // 正常来说后台接口会做处理，无论是地址还是文件对象都支持，目前接口只支持file对象
+    formModel.value.cover_img = await imageUrlToFile(
+      imgUrl.value,
+      formModel.value.cover_img
+    )
   } else {
     //添加
     //添加前要重置formModel数据
@@ -48,7 +57,32 @@ const open = async (row) => {
     // console.log(formModel.value)
   }
 }
+/*
+浏览器环境中，由于安全性限制，不能直接将网络图片地址转换成File对象。File对象是用户在客户端上传文件时才能创建的。
+如果想要将网络图片地址转换成File对象，需要先将图片下载到客户端，再将其转换为File对象。
 
+chatGPT prompt：封装一个函数，基于 axios， 网络图片地址，转 file 对象， 请注意：写中文注释
+*/
+async function imageUrlToFile(url, fileName) {
+  try {
+    // 第一步：使用axios获取网络图片数据
+    const response = await axios.get(url, { responseType: 'arraybuffer' })
+    const imageData = response.data
+
+    // 第二步：将图片数据转换为Blob对象
+    const blob = new Blob([imageData], {
+      type: response.headers['content-type']
+    })
+
+    // 第三步：创建一个新的File对象
+    const file = new File([blob], fileName, { type: blob.type })
+
+    return file
+  } catch (error) {
+    console.error('将图片转换为File对象时发生错误:', error)
+    throw error
+  }
+}
 //通过defineExpose对外暴露组件的方法
 defineExpose({
   open
