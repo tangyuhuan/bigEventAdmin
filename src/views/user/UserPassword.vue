@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import { userUpdatePwdService } from '@/api/user'
 import PageContainer from '@/components/PageContainer.vue'
+import { useUserStore } from '@/stores'
+import { useRouter } from 'vue-router'
+const userStore = useUserStore()
+const router = useRouter()
 const pwdFormRef = ref(null)
 const pwdForm = ref({
   old_pwd: '',
@@ -55,8 +59,14 @@ const submitForm = async () => {
   const res = await userUpdatePwdService(pwdForm.value)
   console.log(res)
   ElMessage.success('修改密码成功')
-  resetForm()
+  //密码修改成功后，退出重新登录
+  //1.清除token
   loading.value = false
+  userStore.removeToken()
+  userStore.setUser({})
+  //2.跳转到登录页
+  router.push('/login')
+  // resetForm()
 }
 const resetForm = () => {
   pwdFormRef.value.resetFields()
@@ -64,7 +74,7 @@ const resetForm = () => {
 }
 </script>
 <template>
-  <page-container title="更换头像">
+  <page-container title="修改密码">
     <el-form
       ref="pwdFormRef"
       :model="pwdForm"
@@ -73,23 +83,28 @@ const resetForm = () => {
       class="pwd-form"
       style="width: 50%"
       v-loading="loading"
+      size="large"
+      status-icon
     >
       <el-form-item label="原密码" prop="old_pwd">
         <el-input
           v-model="pwdForm.old_pwd"
           placeholder="请输入原密码"
+          type="password"
         ></el-input>
       </el-form-item>
       <el-form-item label="新密码" prop="new_pwd">
         <el-input
           v-model="pwdForm.new_pwd"
           placeholder="请输入新密码"
+          type="password"
         ></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="re_pwd">
         <el-input
           v-model="pwdForm.re_pwd"
           placeholder="请再次输入新密码"
+          type="password"
         ></el-input>
       </el-form-item>
       <el-form-item>

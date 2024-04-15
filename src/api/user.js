@@ -22,6 +22,5 @@ export const userUpdateAvatarService = (data) =>
   request.patch('/my/update/avatar', { avatar: data })
 
 //更新用户密码
-
-export const userUpdatePwdService = (data) =>
-  request.patch('/my/updatepwd', data)
+export const userUpdatePwdService = ({ old_pwd, new_pwd, re_pwd }) =>
+  request.patch('/my/updatepwd', { old_pwd, new_pwd, re_pwd })
