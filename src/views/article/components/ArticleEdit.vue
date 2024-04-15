@@ -29,7 +29,6 @@ const formModel = ref({ ...defaultForm })
 const quilContent = ref()
 const emit = defineEmits(['success'])
 const open = async (row) => {
-  visibleDrawer.value = true
   if (row.id) {
     //编辑
     //注意: cover_img的值, 需要自己拼接服务器前缀地址, 和接口服务的基地址相同
@@ -56,6 +55,7 @@ const open = async (row) => {
     quilContent.value.setHTML('')
     // console.log(formModel.value)
   }
+  visibleDrawer.value = true
 }
 /*
 浏览器环境中，由于安全性限制，不能直接将网络图片地址转换成File对象。File对象是用户在客户端上传文件时才能创建的。
@@ -89,14 +89,19 @@ defineExpose({
 })
 const rules = ref({
   title: [
-    { required: true, message: '请输入标题', trigger: 'blur' },
-    { min: 1, max: 20, message: '长度需要在1到20个字符之间', trigger: 'blur' }
+    { required: true, message: '请输入标题', trigger: 'change' },
+    { min: 1, max: 20, message: '长度需要在1到20个字符之间', trigger: 'change' }
   ],
-  cate_id: [{ required: true, trigger: 'blur' }],
-  cover_img: [{ required: true, trigger: 'blur' }],
+  cate_id: [{ required: true, trigger: 'change' }],
+  cover_img: [{ required: true, trigger: 'change' }],
   content: [
-    { required: true, message: '请输入正文', trigger: 'blur' },
-    { min: 1, max: 200, message: '长度需要在1到200个字符之间', trigger: 'blur' }
+    { required: true, message: '请输入正文', trigger: 'change' },
+    {
+      min: 1,
+      max: 200,
+      message: '长度需要在1到200个字符之间',
+      trigger: 'change'
+    }
   ]
 })
 const ruleFormRef = ref()

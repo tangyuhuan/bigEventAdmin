@@ -8,18 +8,18 @@ defineProps({
 </script>
 <template>
   <el-card class="page-container">
-    <!-- 具名插槽 -->
+    <!-- 通过template包裹需要分发的结构，包成一个整体 -->
     <template #header>
       <div class="card-header">
         <span>{{ title }}</span>
         <div class="extra">
+          <!-- 具名插槽 -->
           <slot name="extra"></slot>
           <!-- <el-button type="primary">添加分类</el-button> -->
         </div>
       </div>
     </template>
     <!-- 默认插槽 -->
-
     <slot></slot>
   </el-card>
 </template>

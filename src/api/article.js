@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+// post、put请求直接写参数，get、delete请求需要params对象里包参数
+
 //分类：获取-文章分类
 export const artGetChannelService = () => request.get('/my/cate/list')
 //分类：添加文章分类
@@ -37,3 +39,9 @@ export const artUpdateInfo = (data) => request.put('/my/article/info', data)
 //管理：发布-文章
 //注意data需要是form-data格式的对象
 export const artAddInfo = (data) => request.post('/my/article/add', data)
+
+//管理：删除-文章
+export const artDelInfo = (id) =>
+  request.delete('/my/article/info', {
+    params: { id }
+  })
