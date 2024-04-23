@@ -23,5 +23,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   }
+  // vite中的环境变量 import.meta.env.BASE_URL 就是vite.config.js中的base配置项，指路由的基准地址，默认是 ’/‘
   // base: '/'
 })
